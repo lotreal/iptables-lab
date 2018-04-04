@@ -1,0 +1,20 @@
+* 场景：vm01 使用 vm02 作为网关上网
+** 演示
+#+BEGIN_SRC shell
+vagrant up
+vagrant ssh vm01 -c "ping z.cn"
+#+END_SRC
+
+** 配置
+
+1. vm01
+   #+BEGIN_SRC shell
+sudo route add default gw 10.0.42.20
+   #+END_SRC
+
+2. vm02
+   #+BEGIN_SRC shell
+sudosysctl -w net.ipv4.ip_forward=1
+sudo iptables -t nat -A POSTROUTING ! -d 10.0.42.0/24 -o eth0 -j SNAT --to-source 10.0.42.20
+#OR# sudo iptables -t nat -A POSTROUTING ! -d 10.0.42.0/24 -o eth0 -j MASQUERADE
+   #+END_SRC
