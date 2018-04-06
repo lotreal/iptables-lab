@@ -2,8 +2,8 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "lot/centos7-netlab"
-  # config.vm.box = "centos/7"
+  # config.vm.box = "lot/centos7-netlab"
+  config.vm.box = "centos/7"
 
   config.vm.provider "virtualbox" do |v|
     v.linked_clone = true
