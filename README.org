@@ -9,12 +9,18 @@ vagrant ssh vm01 -c "ping z.cn"
 
 1. vm01
    #+BEGIN_SRC shell
-sudo route add default gw 10.0.42.20
+echo GATEWAY=10.0.42.20 > /etc/sysconfig/network
+systemctl restart network
+ip route del default via 10.0.2.2
    #+END_SRC
 
 2. vm02
    #+BEGIN_SRC shell
-sudosysctl -w net.ipv4.ip_forward=1
-sudo iptables -t nat -A POSTROUTING ! -d 10.0.42.0/24 -o eth0 -j SNAT --to-source 10.0.42.20
-#OR# sudo iptables -t nat -A POSTROUTING ! -d 10.0.42.0/24 -o eth0 -j MASQUERADE
+sysctl -w net.ipv4.ip_forward=1
+
+iptables -t nat -N F42
+iptables -t nat -A F42 -m state --state NEW -j LOG --log-prefix "F42 " --log-tcp-sequence --log-tcp-options --log-ip-options
+iptables -t nat -A F42 -j MASQUERADE
+
+iptables -t nat -A POSTROUTING ! -d 10.0.42.0/24 -o eth0 -j F42
    #+END_SRC
